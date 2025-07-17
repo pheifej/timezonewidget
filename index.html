@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ZIP Code Time Zone Lookup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    input {
+      padding: 0.5em;
+      font-size: 1em;
+    }
+    button {
+      padding: 0.5em 1em;
+      font-size: 1em;
+      margin-left: 1em;
+    }
+    #result {
+      margin-top: 1em;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h2>ZIP Code Time Zone Lookup</h2>
+  <input type="text" id="zip" placeholder="Enter ZIP code" maxlength="5">
+  <button onclick="lookupTime()">Get Time</button>
+  <div id="result"></div>
+
+  <script>
+    async function lookupTime() {
+      const zip = document.getElementById("zip").value;
+      const resultDiv = document.getElementById("result");
+      resultDiv.textContent = "Looking up...";
+
+      try {
+        // Get lat/lng from ZIP code using Zippopotam.us
+        const locRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
+        if (!locRes.ok) throw new Error("ZIP code not found.");
+        const locData = await locRes.json();
+        const { latitude, longitude } = locData.places[0];
+
+        // Get time zone and local time from latitude and longitude
+        const tzRes = await fetch(`https://api.timezonedb.com/v2.1/get-time-zone?key=HDZ97U0LHGG4&format=json&by=position&lat=${latitude}&lng=${longitude}`);
+        if (!tzRes.ok) throw new Error("Could not retrieve time info.");
+        const tzData = await tzRes.json();
+
+        resultDiv.innerHTML = `<strong>Time Zone:</strong> ${tzData.abbreviation}<br><strong>Local Time:</strong> ${tzData.formatted}`;
+      } catch (err) {
+        resultDiv.textContent = err.message;
+      }
+    }
+  </script>
+</body>
+</html>
