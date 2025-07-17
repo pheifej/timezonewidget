@@ -47,7 +47,7 @@
         if (!tzRes.ok) throw new Error("Could not retrieve time info.");
         const tzData = await tzRes.json();
 
-        resultDiv.innerHTML = `<strong>Time Zone:</strong> ${tzData.abbreviation}<br><strong>Local Time:</strong> ${tzData.formatted}`;
+        const localTime = new Date(tzData.formatted); const options = { hour: 'numeric', minute: 'numeric', hour12: true }; const formattedTime = localTime.toLocaleString('en-US', options);  resultDiv.innerHTML = `<strong>Time Zone:</strong> ${tzData.abbreviation}<br><strong>Local Time:</strong> ${formattedTime}`;
       } catch (err) {
         resultDiv.textContent = err.message;
       }
